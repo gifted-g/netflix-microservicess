@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  video-service:
+    build: ./video-service
+    container_name: video-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  recommendation-service:
+    build: ./recommendation-service
+    container_name: recommendation-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  api-gateway:
+    image: nginx:stable
+    container_name: api-gateway
+    volumes:
+      - ./api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - video-service
+      - recommendation-service
